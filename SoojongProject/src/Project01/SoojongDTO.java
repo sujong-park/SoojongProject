@@ -1,5 +1,7 @@
 package Project01;
 
+import java.util.Date;
+
 public class SoojongDTO {
 	
 	int id;
@@ -7,17 +9,17 @@ public class SoojongDTO {
 	String email;
 	String password;
 	
-	String title;        // 게시물 제목
-    String content;      // 게시물 내용
-    String author;       // 작성자 이름
-    String createdAt;    // 작성 날짜 (날짜 형식을 String으로 설정)
+	private String title;
+    private String content;
+    private String author;
+    private Date createdAt;
 	
-	public SoojongDTO(String name, String email, String password) {
-		super();
-		this.name = name;
-		this.email = email;
-		this.password = password;
-	}
+    public SoojongDTO(String title, String content, String author, Date createdAt) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.createdAt = createdAt;
+    }
 	
 	public SoojongDTO(int id, String name, String email, String password) {
 	    this.id = id;
@@ -25,20 +27,13 @@ public class SoojongDTO {
 	    this.email = email;
 	    this.password = password;
 	}
-
-	public SoojongDTO(int id, String title, String author) {
-	    this.id = id;
-	    this.title = title;
-	    this.author = author;
-	    // createdAt 필드의 경우 기본값을 설정하거나 추가적인 값을 받을 수 있습니다.
-	    this.createdAt = "기본 날짜"; // 예시로 기본값 설정
-	}
 	
-	public SoojongDTO(String title, String postCon) {
-		// TODO Auto-generated constructor stub
-		this.title = title;
-		this.content = content;
-	}
+	public SoojongDTO(int id, String title, String author, Date createdAt) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.createdAt = createdAt;
+    }
 
 	@Override
 	public String toString() {
@@ -79,6 +74,22 @@ public class SoojongDTO {
 	public void setContent(String content) {
 		this.content = content;
 	}
+	
+	public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+    
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
 	public String getEmail() {
 		return email;

@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -24,6 +25,11 @@ import javax.swing.ListSelectionModel;
 public class SoojongPostWrite extends JFrame {
 	private JTextField titField;
 	private JTextArea contentField;
+	
+	private String title;
+    private String content;
+    private String author;
+    private Date createdAt;
 	
 	SoojongDAO dao = null;
 	
@@ -69,8 +75,6 @@ public class SoojongPostWrite extends JFrame {
 		JButton addPostBtn = new JButton("등록");
 		btnPanel.add(addPostBtn);
 		
-		JButton removePostBtn = new JButton("삭제");
-		btnPanel.add(removePostBtn);
 		
 		JPanel ListPanel = new JPanel();
 		ListPanel.setLayout(new FlowLayout());
@@ -78,40 +82,28 @@ public class SoojongPostWrite extends JFrame {
 		add(btnPanel, BorderLayout.SOUTH);
 		
 
+		// SoojongPostWrite 클래스 내부에 있는 코드 예시
 		addPostBtn.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        String title = titField.getText();
+		        String content = contentField.getText();
+		        String author = "이름"; // 또는 사용자 입력을 받는 방식
+		        Date createdAt = new Date(); // 현재 날짜
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String title = titField.getText();
-				String content = contentField.getText();
+		        SoojongDTO dto = new SoojongDTO(title, content, author, createdAt);
+		        boolean isInserted = dao.insertMember(dto);
 
-				SoojongDTO dto = new SoojongDTO(title, content);
-				dao.insertMember(dto);
-				refreshTable();
-				
-//				SoojongDTO memberLsyTest1205DTO = dao.selectMemberByEmail(email);
-				// 이메일 중복 여부
-//				if (memberLsyTest1205DTO == null) {
-//
-//					// 패스워드 일치 여부 확인
-//					if (password.equals(passwordConfirm)) {
-//						LsyTest1205DTO dto = new LsyTest1205DTO(name, email, password);
-//						dao.insertMember(dto);
-//						refreshTable();
-//
-//					} else {
-//						// 경고 메시지 출력
-//						JOptionPane.showMessageDialog(null, "패스워드가 일치하지 않습니다. 다시 확인해주세요.", "경고",
-//								JOptionPane.WARNING_MESSAGE);
-//					}
-//				} // 이메일 중복 여부
-//				else {
-//					// 경고 메시지 출력
-//					JOptionPane.showMessageDialog(null, "이메일 중복입니다. 다시 확인해주세요.", "경고",
-//							JOptionPane.WARNING_MESSAGE);
-//				}
-			}
+		        if (isInserted) {
+		            System.out.println("insert 성공");
+		            dispose(); // 창 닫기
+		        } else {
+		            System.out.println("insert 실패");
+		        }
+		        refreshTable();
+		    }
 		});
+
 		
 		
 		
