@@ -9,28 +9,28 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 public class SoojongDAO {
+
 	// DAO(Data Access Object), 비지니스 로직 처리하는 기능 모음집
 	// crud, -> insert, select(전체조회), update, delete, select(한명 조회,email, id)
-	public boolean insertMember(SoojongDTO lsyTest1205DTO) {
+	public boolean insertMember(SoojongDTO SoojongDTO) {
 		boolean ok = false;
-		Connection con = null; // 연결
-		PreparedStatement pstmt = null; // 명령
-		
-		// MemberDTO memberDTO, 객체, 인스턴스, 게터, 세터.
-		// 게터로 각 요소를 하나씩 꺼내기.
-		int id = lsyTest1205DTO.getId();
-		String name = lsyTest1205DTO.getName();
-		String email = lsyTest1205DTO.getEmail();
-		String password = lsyTest1205DTO.getPassword();
+		Connection con = null;
+		PreparedStatement pstmt = null;
+
+		int id = SoojongDTO.getId();
+		String title = SoojongDTO.getTitle();
+		String content = SoojongDTO.getContent();
+		String author = SoojongDTO.getName();
+		String createdAt = SoojongDTO.getContent();
 		try {
-			
 			con = ConnectionDB.getConn();
-			String sql = "insert into member501(" + "id,name,email,password" + ") "
-					+ "values(member501_seq.NEXTVAL,?,?,?)";
+			String sql = "insert into post(" + "id,name,email,password" + ") "
+					+ "values(post_seq.NEXTVAL,?,?,?,?)";
 			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, name);
-			pstmt.setString(2, email);
-			pstmt.setString(3, password);
+			pstmt.setString(1, title);
+			pstmt.setString(2, content);
+			pstmt.setString(3, author);
+			pstmt.setString(4, createdAt);
 			
 			int r = pstmt.executeUpdate(); // 실행 -> 저장
 			if (r > 0) {
@@ -55,55 +55,50 @@ public class SoojongDAO {
 		return ok;
 	} // insert
 
-	// 조회
 	public ArrayList<SoojongDTO> selectAllMember() {
-		
-		Connection con = null; // 연결
-		PreparedStatement pstmt = null; // 명령
-		ResultSet rs = null; // 결과
-		
-		ArrayList<SoojongDTO> resultList = null;
-		try {
-			con = ConnectionDB.getConn();
-			String sql = "select * from member501 order by id desc";
-			pstmt = con.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			
-			resultList = new ArrayList<SoojongDTO>();
-			while (rs.next()) {
-				int id = rs.getInt("id");
-				String name = rs.getString("name");
-				String email = rs.getString("email");
-				String password = rs.getString("password");
-				
-				SoojongDTO dto = new SoojongDTO(id, name, email, password);
-				
-				resultList.add(dto);
+	    Connection con = null; // 연결
+	    PreparedStatement pstmt = null; // 명령
+	    ResultSet rs = null; // 결과
+	    
+	    ArrayList<SoojongDTO> resultList = new ArrayList<SoojongDTO>();
+	    try {
+	        con = ConnectionDB.getConn();
+	        String sql = "SELECT * FROM post ORDER BY id DESC";
+	        pstmt = con.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            int id = rs.getInt("id");
+	            String title = rs.getString("title");
+	            String author = rs.getString("author");
+	            // createdAt을 더 이상 사용할 필요가 없거나 기본값을 사용
+	            String createdAt = "기본 날짜"; // 필요 시 이 값을 설정
+	            
+	            // DTO 생성자 호출
+	            SoojongDTO dto = new SoojongDTO(id, title, author);
+	            resultList.add(dto);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) {
+	                rs.close();
+	            }
+	            if (pstmt != null) {
+	                pstmt.close();
+	            }
+	            if (con != null) {
+	                con.close();
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return resultList;
+	}
 
-			} // while
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-				if (pstmt != null)
-					pstmt.close();
-				if (con != null)
-					con.close();
-				// 사용한 자원을 finally 문을 이용해서 반납한다.
-				// 자원 반납은 사용했던 객체의 역순으로 하며 모두 공통적으로
-				// close() 메소드를 사용한다.
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return resultList;
-
-	}// selectMember
-
-	// 한명만 조회
+	// 회원 조회, ID
 	public SoojongDTO selectMemberById(int memberId) {
 
 		Connection con = null; // 연결
@@ -184,45 +179,44 @@ public class SoojongDAO {
 		return dto;
 	}
 
-	// 한명만 조회, 
-	public SoojongDTO selectMemberById(String inputEmail) {
+	// 한명만 조회, name
+	public SoojongDTO selectMemberByName(String inputName) {
 
-		Connection con = null; // 연결
-		PreparedStatement pstmt = null; // 명령
-		ResultSet rs = null; // 결과
-		SoojongDTO dto = null; // 반환할 DTO 객체
+	    Connection con = null; // 연결 객체
+	    PreparedStatement pstmt = null; // 명령 객체
+	    ResultSet rs = null; // 결과 객체
+	    SoojongDTO dto = null; // 반환할 DTO 객체
 
-		try {
-			con = ConnectionDB.getConn();
-			String sql = "select * from member501 where name = ?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, inputEmail); // 첫 번째 매개변수로 id 설정
-			rs = pstmt.executeQuery();
+	    try {
+	        con = ConnectionDB.getConn();
+	        String sql = "SELECT * FROM member501 WHERE name = ?";
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, inputName); // 첫 번째 매개변수로 name 설정
+	        rs = pstmt.executeQuery();
 
-			if (rs.next()) {
-				int id = rs.getInt("id");
-				String name = rs.getString("name");
-				String email = rs.getString("email");
-				String password = rs.getString("password");
-				dto = new SoojongDTO(id, name, email, password);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (pstmt != null)
-					pstmt.close();
-				if (con != null)
-					con.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return dto;
+	        if (rs.next()) {
+	            int id = rs.getInt("id");
+	            String name = rs.getString("name");
+	            String email = rs.getString("email");
+	            String password = rs.getString("password");
+	            dto = new SoojongDTO(id, name, email, password); // DTO 객체 생성
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (pstmt != null) pstmt.close();
+	            if (con != null) con.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return dto;
 	}
 
+	
+	
 	
 	// 삭제
 	public void deleteMember(int user_id) {
